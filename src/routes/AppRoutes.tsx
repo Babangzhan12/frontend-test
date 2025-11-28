@@ -11,6 +11,9 @@ import Accounts from "../pages/Accounts/accounts";
 import AppLayout from "../components/app-layout";
 import App from "../App";
 import History from "../pages/History/history";
+import UnlockPin from "../pages/Auth/unlock-pin";
+import SuccessScreen from "../components/success-screen";
+import CreatePin from "../pages/Auth/create-pin";
 
 const Protected = ({ children }: any) => {
   const token = useAuth((s) => s.token);
@@ -40,6 +43,12 @@ export default function AppRoutes() {
         <Route path="/deposit/:id" element={<AppLayout><Deposit /></AppLayout>} />
         <Route path="/withdraw/:id" element={<AppLayout><Withdraw /></AppLayout>} />
         <Route path="/history" element={<AppLayout><History /></AppLayout>} />
+        <Route path="/unlock-pin" element={<UnlockPin />} />
+        <Route
+        path="/success-withdraw"
+        element={<SuccessScreen title="Withdraw Successful!" goTo="/accounts" />}
+        />
+        <Route path="/create-pin" element={<CreatePin />} />
       </Routes>
     </BrowserRouter>
   );

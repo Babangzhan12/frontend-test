@@ -1,6 +1,8 @@
+import useIdleLock from "../hooks/useIdleLock";
 import BottomNav from "./bottom-nav";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
+useIdleLock(60000);
   return (
     <div style={{ minHeight: "100vh", background: "#f7f9fc" }}>
 

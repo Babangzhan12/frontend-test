@@ -1,5 +1,5 @@
 import { Card, Grid, Text, Center } from "@mantine/core";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   IconUser,
   IconCreditCard,
@@ -10,6 +10,8 @@ import {
   IconLogout,
 } from "@tabler/icons-react";
 import BottomNav from "../../components/bottom-nav";
+import { useEffect, useState } from "react";
+import api from "../../services/axios";
 
 const MenuBox = ({ title, icon, path }: any) => (
   <Link to={path} style={{ textDecoration: "none" }}>
@@ -38,6 +40,22 @@ const MenuBox = ({ title, icon, path }: any) => (
 );
 
 export default function Dashboard() {
+    const [accounts, setAccounts] = useState<any[]>([]);
+    const navigate = useNavigate();
+
+    const loadAccounts = async () => {
+    const res = await api.get("/accounts/my");
+    setAccounts(res.data || []);
+    if (!res.data.hasPin) {
+    navigate("/create-pin");
+    } else {
+    navigate("/");
+    }
+    };
+
+    useEffect(() => {
+    loadAccounts();
+    }, []);
   return (
     <div >
 

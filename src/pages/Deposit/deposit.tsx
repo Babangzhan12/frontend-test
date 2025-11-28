@@ -2,11 +2,17 @@ import { NumberInput, Button } from "@mantine/core";
 import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import api from "../../services/axios";
+import PinSheet from "../../components/pin-sheet";
 
 export default function Deposit() {
   const { id } = useParams();
   const [amount, setAmount] = useState(0);
   const navigate = useNavigate();
+  const [pinOpen, setPinOpen] = useState(false);
+
+  const submitDeposit = async () => {
+  setPinOpen(true);
+    };
 
   const doDeposit = async () => {
     await api.post(`/transactions/${id}/deposit`, {
@@ -21,9 +27,14 @@ export default function Deposit() {
       <h2>Deposit to Account</h2>
 
       <NumberInput label="Amount" value={amount} onChange={(v) => setAmount(Number(v))} />
-      <Button fullWidth mt="md" onClick={doDeposit}>
+      <Button fullWidth mt="md" onClick={submitDeposit}>
         Deposit
       </Button>
+      <PinSheet
+      opened={pinOpen}
+      onClose={() => setPinOpen(false)}
+      onSuccess={doDeposit}
+    />
     </div>
   );
 }
