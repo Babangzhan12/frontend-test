@@ -1,5 +1,5 @@
-import { Card, Grid, Text, Center } from "@mantine/core";
-import { Link, useNavigate } from "react-router-dom";
+import { Card, Grid, Text } from "@mantine/core";
+import { Link } from "react-router-dom";
 import {
   IconUser,
   IconCreditCard,
