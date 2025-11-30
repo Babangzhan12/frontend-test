@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { TextInput, Button, Paper } from "@mantine/core";
 import api from "../../services/axios";
+import { useAuth } from "../../store/auth.store";
 
 export default function Profile() {
   const [profile, setProfile] = useState<any>({
@@ -10,13 +11,24 @@ export default function Profile() {
     ktpNumber: "",
   });
 
+  const user = useAuth((s) => s.user);
+  const profileId = user?.profile?.profileId;
+
   const loadProfile = async () => {
-    const res = await api.get("/profile/me");
-    setProfile(res.data);
+    const res = await await api.get(`/profile/${profileId}`);
+    const p = res.data.data;
+     setProfile({
+    fullName: p.fullName,
+    address: p.address,
+    phoneNumber: p.phoneNumber,
+    ktpNumber: p.ktpNumber,
+  });
   };
 
+  console.log("profile", profile);
+
   const saveProfile = async () => {
-    await api.put("/profile", profile);
+    await api.put(`/profile/${profileId}`, profile);
     alert("Profile updated!");
   };
 

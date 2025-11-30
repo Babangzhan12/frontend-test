@@ -16,27 +16,54 @@ export default function UnlockPin() {
   const back = () => setPin(pin.slice(0, -1));
 
   const verify = async () => {
-    const res = await api.post("/auth/verify-pin", { pin });
-
-    if (!res.data.valid) {
+    const handleFailedAttempt = async (message?: string) => {
       setPin("");
-       setShake(true);
+      setShake(true);
+      setTimeout(() => setShake(false), 400);
 
-        setTimeout(() => setShake(false), 400);
-      setFailCount(failCount + 1);
+      const nextFail = failCount + 1;
+      setFailCount(nextFail);
 
-      if (failCount + 1 >= 3) {
-        await api.post("/auth/block");
+      if (nextFail >= 3) {
+        try {
+          await api.post("/auth/block");
+        } catch (blockErr) {
+          console.error("Failed to block user:", blockErr);
+        }
         alert("PIN salah 3x, akun Anda diblokir sementara!");
+        localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("pinUnlocked");
         navigate("/login");
         return;
       }
 
-      alert(`PIN salah! Percobaan ${failCount + 1}/3`);
-      return;
-    }
+      alert(message || `PIN salah! Percobaan ${nextFail}/3`);
+    };
 
-    navigate("/");
+    try {
+      const res = await api.post("/auth/verify-pin", { pin });
+      console.debug("verify-pin response", res.data);
+
+      const ok = typeof res.data === "object" && res.data !== null && "status" in res.data ? (res.data as any).status : Boolean(res.data);
+
+      if (!ok) {
+        const message = typeof res.data === "object" && (res.data as any).message ? (res.data as any).message : undefined;
+        await handleFailedAttempt(message);
+        return;
+      }
+      localStorage.setItem("pinUnlocked", "true");
+      navigate("/dashboard");
+    } catch (err: any) {
+      console.error("verify-pin error", err);
+      const respData = err?.response?.data;
+      if (respData && typeof respData === "object" && respData.status === false) {
+        await handleFailedAttempt(respData.message);
+        return;
+      }
+
+      alert("Terjadi kesalahan saat verifikasi PIN.");
+    }
   };
 
   return (

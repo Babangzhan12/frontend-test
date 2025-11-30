@@ -10,8 +10,8 @@ export default function Accounts() {
 
   const loadAccounts = async () => {
     try {
-      const res = await api.get("/accounts/my");
-      setAccounts(res.data || []);
+      const res = await api.get("/accounts");
+      setAccounts(Array.isArray(res.data.data) ? res.data.data : []);
     } catch (err) {
       console.error(err);
       setAccounts([]);

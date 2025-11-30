@@ -15,11 +15,12 @@ export default function Deposit() {
     };
 
   const doDeposit = async () => {
-    await api.post(`/transactions/${id}/deposit`, {
+    const res = await api.post(`/transactions/${id}/deposit`, {
       amount,
       date: new Date(),
     });
-    navigate("/");
+    console.log("DEPOSIT OK", res.data);
+    navigate("/dashboard");
   };
 
   return (

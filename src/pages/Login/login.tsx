@@ -12,7 +12,8 @@ export default function Login() {
 
   const doLogin = async () => {
     const ok = await login(username, password);
-    if (ok) navigate("/");
+    console.debug('Login result:', ok, 'token:', localStorage.getItem('token'));
+    if (ok) navigate("/dashboard", { replace: true });
     else alert("Invalid username or password!");
   };
 

@@ -11,8 +11,8 @@ export default function History() {
   const [items, setItems] = useState<any[]>([]);
 
   const loadHistory = async () => {
-    const res = await api.get("/transactions/my");
-    setItems(res.data);
+    const res = await api.get("/transactions");
+    setItems(res.data?.data || []);
   };
 
   useEffect(() => {
@@ -49,59 +49,76 @@ export default function History() {
         </Text>
       )}
 
-      {items.map((trx) => (
-        <Card
-          key={trx.transactionId}
-          shadow="xs"
-          radius="md"
-          withBorder
-          mb="md"
-          p="md"
-          style={{ display: "flex", gap: 15 }}
-        >
-          <div
-            style={{
-              width: 50,
-              height: 50,
-              borderRadius: "50%",
-              background: "#f0f2f5",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+      {items.map((trx) => {
+        const deposito = trx.account?.depositoType;
+        const depositoName = deposito?.name || "-";
+        const depositoReturn =
+          deposito?.yearlyReturn
+            ? `${Number(deposito.yearlyReturn) * 100}% / year`
+            : "-";
+
+        return (
+          <Card
+            key={trx.transactionId}
+            shadow="xs"
+            radius="md"
+            withBorder
+            mb="md"
+            p="md"
+            style={{ display: "flex", gap: 15 }}
           >
-            {iconMap[trx.type]}
-          </div>
-
-          <div style={{ flex: 1 }}>
-            <Group justify="space-between">
-              <Text fw={700}>{labelMap[trx.type]}</Text>
-
-              <Badge color={colorMap[trx.type]} variant="light">
-                {trx.type.toUpperCase()}
-              </Badge>
-            </Group>
-
-            <Text c="dimmed" fz="sm" mt={3}>
-              {new Date(trx.transactionDate).toLocaleString("id-ID")}
-            </Text>
-
-            <Text fw={700} fz={20} mt={5}
+            <div
               style={{
-                color: trx.type === "withdraw" ? "red" : "green",
+                width: 50,
+                height: 50,
+                borderRadius: "50%",
+                background: "#f0f2f5",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              {trx.type === "withdraw" ? "-" : "+"}{" "}
-              Rp {Number(trx.amount).toLocaleString("id-ID")}
-            </Text>
+              {iconMap[trx.type]}
+            </div>
 
-            <Text mt={3} c="dimmed" fz="sm">
-              Balance: Rp {Number(trx.startingBalance).toLocaleString("id-ID")} →{" "}
-              Rp {Number(trx.endingBalance).toLocaleString("id-ID")}
-            </Text>
-          </div>
-        </Card>
-      ))}
+            <div style={{ flex: 1 }}>
+              <Group justify="space-between">
+                <Text fw={700}>{labelMap[trx.type]}</Text>
+
+                <Badge color={colorMap[trx.type]} variant="light">
+                  {trx.type.toUpperCase()}
+                </Badge>
+              </Group>
+
+              <Text fz="sm" mt={3}>
+                <b>{depositoName}</b> ({depositoReturn})
+              </Text>
+
+              <Text c="dimmed" fz="sm" mt={3}>
+                {new Date(trx.transactionDate).toLocaleString("id-ID")}
+              </Text>
+
+              <Text
+                fw={700}
+                fz={20}
+                mt={5}
+                style={{
+                  color: trx.type === "withdraw" ? "red" : "green",
+                }}
+              >
+                {trx.type === "withdraw" ? "-" : "+"}{" "}
+                Rp {Number(trx.amount).toLocaleString("id-ID")}
+              </Text>
+
+              <Text mt={3} c="dimmed" fz="sm">
+                Balance: Rp{" "}
+                {Number(trx.startingBalance).toLocaleString("id-ID")} → Rp{" "}
+                {Number(trx.endingBalance).toLocaleString("id-ID")}
+              </Text>
+            </div>
+          </Card>
+        );
+      })}
     </div>
   );
 }

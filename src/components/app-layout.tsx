@@ -1,11 +1,23 @@
 import useIdleLock from "../hooks/useIdleLock";
 import BottomNav from "./bottom-nav";
+import useTotalBalance from "../hooks/useTotalBalance";
+import { useState } from "react";
+import { IconEye, IconEyeOff } from "@tabler/icons-react";
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
-useIdleLock(60000);
+export default function AppLayout({
+  children,
+  showTotalBalance = true,
+}: {
+  children: React.ReactNode;
+  showTotalBalance?: boolean;
+}) {
+  useIdleLock(60000);
+
+  const { total, loading } = useTotalBalance();
+  const [visible, setVisible] = useState(false);
+
   return (
     <div style={{ minHeight: "100vh", background: "#f7f9fc" }}>
-
       <div
         style={{
           background: "linear-gradient(135deg, #0a4bd3, #1e6bff)",
@@ -15,10 +27,37 @@ useIdleLock(60000);
         }}
       >
         <h2 style={{ margin: 0, fontWeight: 700 }}>Welcome back 👋</h2>
-        <h1 style={{ margin: 0, fontSize: 30, fontWeight: 800 }}>
-          Rp 12.500.000
-        </h1>
-        <p style={{ margin: 0, opacity: 0.8 }}>Total Balance</p>
+
+        {showTotalBalance && (
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <h1 style={{ margin: 0, fontSize: 30, fontWeight: 800 }}>
+              {loading
+                ? "Loading..."
+                : visible
+                ? `Rp ${total.toLocaleString("id-ID")}`
+                : "Rp •••••••••"}
+            </h1>
+
+            <div
+              onClick={() => setVisible(!visible)}
+              style={{
+                cursor: "pointer",
+                marginTop: 5,
+                opacity: 0.8,
+              }}
+            >
+              {visible ? (
+                <IconEyeOff color="white" />
+              ) : (
+                <IconEye color="white" />
+              )}
+            </div>
+          </div>
+        )}
+
+        {showTotalBalance && (
+          <p style={{ margin: 0, opacity: 0.8 }}>Total Balance</p>
+        )}
       </div>
 
       <div
@@ -26,10 +65,10 @@ useIdleLock(60000);
         style={{
           padding: "20px",
           paddingBottom: "100px",
-          marginTop: "-70px",
-            background: "#f3f6fa",
-            borderRadius: "20px 20px 0 0",
-            minHeight: "100vh",
+          marginTop: showTotalBalance ? "-70px" : "0px",
+          background: "#f3f6fa",
+          borderRadius: "20px 20px 0 0",
+          minHeight: "100vh",
         }}
       >
         {children}
@@ -39,4 +78,3 @@ useIdleLock(60000);
     </div>
   );
 }
-

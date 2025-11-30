@@ -3,16 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   IconUser,
   IconCreditCard,
-  IconCash,
-  IconArrowDown,
-  IconArrowUp,
   IconHistory,
   IconLogout,
 } from "@tabler/icons-react";
 import BottomNav from "../../components/bottom-nav";
-import { useEffect, useState } from "react";
-import api from "../../services/axios";
-
 const MenuBox = ({ title, icon, path }: any) => (
   <Link to={path} style={{ textDecoration: "none" }}>
     <Card
@@ -40,22 +34,6 @@ const MenuBox = ({ title, icon, path }: any) => (
 );
 
 export default function Dashboard() {
-    const [accounts, setAccounts] = useState<any[]>([]);
-    const navigate = useNavigate();
-
-    const loadAccounts = async () => {
-    const res = await api.get("/accounts/my");
-    setAccounts(res.data || []);
-    if (!res.data.hasPin) {
-    navigate("/create-pin");
-    } else {
-    navigate("/");
-    }
-    };
-
-    useEffect(() => {
-    loadAccounts();
-    }, []);
   return (
     <div >
 
@@ -70,13 +48,13 @@ export default function Dashboard() {
             <MenuBox title="Accounts" path="/accounts" icon={<IconCreditCard size={32} />} />
           </Grid.Col>
 
-          <Grid.Col span={6}>
+          {/* <Grid.Col span={6}>
             <MenuBox title="Deposit" path="/deposit/select" icon={<IconArrowDown size={32} />} />
           </Grid.Col>
 
           <Grid.Col span={6}>
             <MenuBox title="Withdraw" path="/withdraw/select" icon={<IconArrowUp size={32} />} />
-          </Grid.Col>
+          </Grid.Col> */}
 
           <Grid.Col span={6}>
             <MenuBox title="History" path="/history" icon={<IconHistory size={32} />} />

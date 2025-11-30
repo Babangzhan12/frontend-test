@@ -29,7 +29,7 @@ export default function CreatePin() {
 
     await api.post("/auth/set-pin", { pin });
     alert("PIN created!");
-    navigate("/");
+    navigate("/dashboard");
   };
 
   return (

@@ -6,15 +6,25 @@ export default function ATMCard({
   accountId,
   depositoType,
 }: any) {
+  const getTypeKey = (name: string) => {
+  if (!name) return "default";
+
+  name = name.toLowerCase();
+
+  if (name.includes("bronze")) return "bronze";
+  if (name.includes("silver")) return "silver";
+  if (name.includes("gold")) return "gold";
+
+  return "default";
+};
   const gradientMap: any = {
     bronze: "linear-gradient(135deg, #8C5E3C, #C8926B)",
     silver: "linear-gradient(135deg, #9ea7b8, #d0d5dd)",
     gold: "linear-gradient(135deg, #b99343, #ffd700)",
     default: "linear-gradient(135deg, #1147d7, #1ea2ff)",
   };
-
-  const cardColor =
-    gradientMap[depositoType] || gradientMap["default"];
+  const typeKey = getTypeKey(depositoType);
+  const cardColor = gradientMap[typeKey];
 
   return (
     <Card

@@ -1,41 +1,100 @@
-import { NumberInput, Button } from "@mantine/core";
+import { NumberInput, Button, Text, Card } from "@mantine/core";
 import { useParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "../../services/axios";
 import PinSheet from "../../components/pin-sheet";
 
 export default function Withdraw() {
   const { id } = useParams();
-  const [amount, setAmount] = useState(0);
   const navigate = useNavigate();
+
+  const [amount, setAmount] = useState(0);
+
   const [pinOpen, setPinOpen] = useState(false);
 
+  const [account, setAccount] = useState<any>(null);
+  const [minRemaining, setMinRemaining] = useState(0);
+
+  const loadAccount = async () => {
+    const res = await api.get(`/accounts/${id}`);
+    const acc = res.data?.data;
+
+    setAccount(acc);
+    setMinRemaining(Number(acc.depositoType.initialDeposit));
+  };
+
+  useEffect(() => {
+    loadAccount();
+  }, []);
+
+  const canWithdraw =
+    account && amount > 0 && account.balance - amount >= minRemaining;
+
   const submitWithdraw = async () => {
-  setPinOpen(true);
-};
+    if (!canWithdraw) return;
+
+    setPinOpen(true);
+  };
 
   const doWithdraw = async () => {
     await api.post(`/transactions/${id}/withdraw`, {
       amount,
       date: new Date(),
     });
-    navigate("/success-withdraw");
+
+    navigate("/");
   };
+
+  if (!account) return <Text>Loading...</Text>;
 
   return (
     <div style={{ padding: 20 }}>
       <h2>Withdraw from Account</h2>
 
-      <NumberInput label="Amount" value={amount} onChange={(v) => setAmount(Number(v))} />
+      <Card withBorder radius="md" p="md" mb="md">
+        <Text fw={600}>Current Balance:</Text>
+        <Text fz={22} fw={800}>
+          Rp {Number(account.balance).toLocaleString("id-ID")}
+        </Text>
 
-      <Button color="red" fullWidth mt="md" onClick={submitWithdraw}>
+        <Text mt="md" fw={600}>
+          Minimum Remaining Balance:
+        </Text>
+        <Text fz={18} color="red">
+          Rp {minRemaining.toLocaleString("id-ID")}
+        </Text>
+      </Card>
+
+      <NumberInput
+        label="Withdraw Amount"
+        value={amount}
+        onChange={(v) => setAmount(Number(v))}
+        min={0}
+      />
+
+      {!canWithdraw && amount > 0 && (
+        <Text mt={8} color="red">
+          You must leave at least Rp{" "}
+          {minRemaining.toLocaleString("id-ID")} in the account.
+        </Text>
+      )}
+
+      <Button
+        fullWidth
+        mt="lg"
+        radius="md"
+        color="red"
+        onClick={submitWithdraw}
+        disabled={!canWithdraw}
+      >
         Withdraw
       </Button>
+
       <PinSheet
-      opened={pinOpen}
-      onClose={() => setPinOpen(false)}
-      onSuccess={doWithdraw}
-    />
+        opened={pinOpen}
+        onClose={() => setPinOpen(false)}
+        onSuccess={doWithdraw}
+      />
     </div>
   );
 }

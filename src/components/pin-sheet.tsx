@@ -13,7 +13,7 @@ export default function PinSheet({ opened, onClose, onSuccess }: any) {
 
   const verify = async () => {
     const res = await api.post("/auth/verify-pin", { pin });
-    if (res.data.valid) {
+    if (res.data?.status) {
       setPin("");
       onSuccess();
       onClose();
