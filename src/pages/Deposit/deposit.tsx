@@ -10,16 +10,22 @@ export default function Deposit() {
   const navigate = useNavigate();
   const [pinOpen, setPinOpen] = useState(false);
 
-  const submitDeposit = async () => {
-  setPinOpen(true);
-    };
+  const submitDeposit = () => {
+    if (amount <= 0) {
+      alert("Nominal harus lebih dari 0");
+      return;
+    }
+    setPinOpen(true);
+  };
 
   const doDeposit = async () => {
-    const res = await api.post(`/transactions/${id}/deposit`, {
+    await api.post(`/transactions/${id}/deposit`, {
       amount,
       date: new Date(),
     });
-    console.log("DEPOSIT OK", res.data);
+
+    alert(`Berhasil deposit Rp ${Number(amount).toLocaleString("id-ID")}`);
+
     navigate("/dashboard");
   };
 
@@ -27,15 +33,21 @@ export default function Deposit() {
     <div style={{ padding: 20 }}>
       <h2>Deposit to Account</h2>
 
-      <NumberInput label="Amount" value={amount} onChange={(v) => setAmount(Number(v))} />
+      <NumberInput
+        label="Amount"
+        value={amount}
+        onChange={(v) => setAmount(Number(v))}
+      />
+
       <Button fullWidth mt="md" onClick={submitDeposit}>
         Deposit
       </Button>
+
       <PinSheet
-      opened={pinOpen}
-      onClose={() => setPinOpen(false)}
-      onSuccess={doDeposit}
-    />
+        opened={pinOpen}
+        onClose={() => setPinOpen(false)}
+        onSuccess={doDeposit}
+      />
     </div>
   );
 }
