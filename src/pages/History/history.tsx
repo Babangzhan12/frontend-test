@@ -51,7 +51,7 @@ export default function History() {
 
       {items.map((trx) => {
         const deposito = trx.account?.depositoType;
-        const depositoName = deposito?.name || "-";
+        const depositoName = deposito?.name || '-';
         const depositoReturn =
         deposito?.yearlyReturn
           ? `${(parseFloat(deposito.yearlyReturn) * 100).toFixed(2).replace(/\.00$/, "")}% / year`
