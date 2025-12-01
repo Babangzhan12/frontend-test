@@ -23,10 +23,7 @@ export default function Deposit() {
       amount,
       date: new Date(),
     });
-
-    alert(`Berhasil deposit Rp ${Number(amount).toLocaleString("id-ID")}`);
-
-    navigate("/dashboard");
+    navigate("/success-deposit");
   };
 
   return (

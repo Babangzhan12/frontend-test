@@ -41,8 +41,7 @@ export default function Withdraw() {
       amount,
       date: new Date(),
     });
-
-    navigate("/");
+    navigate("/success-withdraw");
   };
 
   if (!account) return <Text>Loading...</Text>;

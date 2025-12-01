@@ -172,6 +172,14 @@ export default function AppRoutes() {
           </Protected>
       }
         />
+        <Route
+        path="/success-deposit"
+        element={
+          <Protected>
+            <SuccessScreen title="Deposit Successful!" goTo="/dashboard" />
+          </Protected>
+      }
+        />
         <Route path="/create-pin" element={
           <LoggedInOnly>
             {/* <AppLayout> */}

@@ -53,9 +53,9 @@ export default function History() {
         const deposito = trx.account?.depositoType;
         const depositoName = deposito?.name || "-";
         const depositoReturn =
-          deposito?.yearlyReturn
-            ? `${Number(deposito.yearlyReturn) * 100}% / year`
-            : "-";
+        deposito?.yearlyReturn
+          ? `${(parseFloat(deposito.yearlyReturn) * 100).toFixed(2).replace(/\.00$/, "")}% / year`
+          : "-";
 
         return (
           <Card
