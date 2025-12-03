@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../../services/axios";
+import { Button } from "@mantine/core";
 
 export default function CreateProfile() {
   const navigate = useNavigate();
+  const [saving, setSaving] = useState(false);
 
   const [form, setForm] = useState({
     fullName: "",
@@ -14,14 +16,17 @@ export default function CreateProfile() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setSaving(true);
+
     try {
       await api.post("/profile", form);
-
       alert("Profile saved.");
-      navigate("/"); 
+      navigate("/");
     } catch (err) {
       console.error(err);
       alert("Failed to save profile.");
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -54,7 +59,14 @@ export default function CreateProfile() {
           onChange={(e) => setForm({ ...form, ktpNumber: e.target.value })}
         /><br /><br />
 
-        <button type="submit">Save Profile</button>
+         <Button
+          type="submit"
+          fullWidth
+          mt="lg"
+          loading={saving}
+        >
+          Save Changes
+        </Button>
       </form>
     </div>
   );

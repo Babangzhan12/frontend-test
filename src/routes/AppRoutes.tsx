@@ -19,6 +19,7 @@ import api from "../services/axios";
 import CreateProfile from "../pages/Profile/create-profile";
 import Logout from "../pages/Auth/logout";
 import Home from "../pages/Home/home";
+import { Loader } from "@mantine/core";
 
 const GuestOnly = ({ children }: any) => {
   const token = useAuth((s) => s.token);
@@ -72,7 +73,19 @@ const Protected = ({ children }: any) => {
   }, [token]);
 
   console.debug("Protected status:", { status, token, path: location.pathname });
-  if (status === "loading") return <div>Loading...</div>;
+  if (status === "loading") {
+  return (
+    <div style={{
+      height: "100vh",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      background: "white"
+    }}>
+      <Loader size="lg" color="blue" />
+    </div>
+  );
+}
   if (status === "unauth") return <Navigate to="/login" />;
   if (status === "no-profile") {
     if (location.pathname !== "/create-profile") return <Navigate to="/create-profile" />;

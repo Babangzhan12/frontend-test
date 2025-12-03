@@ -3,6 +3,7 @@ import BottomNav from "./bottom-nav";
 import useTotalBalance from "../hooks/useTotalBalance";
 import { useState } from "react";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
+import { Loader } from "@mantine/core";
 
 export default function AppLayout({
   children,
@@ -30,28 +31,33 @@ export default function AppLayout({
 
         {showTotalBalance && (
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <h1 style={{ margin: 0, fontSize: 30, fontWeight: 800 }}>
-              {loading
-                ? "Loading..."
-                : visible
-                ? `Rp ${total.toLocaleString("id-ID")}`
-                : "Rp •••••••••"}
-            </h1>
+            {loading ? (
+              <Loader color="white" size="sm" />
+            ) : (
+              <h1 style={{ margin: 0, fontSize: 30, fontWeight: 800 }}>
+                {visible
+                  ? `Rp ${total.toLocaleString("id-ID")}`
+                  : "Rp •••••••••"}
+              </h1>
+            )}
 
-            <div
-              onClick={() => setVisible(!visible)}
-              style={{
-                cursor: "pointer",
-                marginTop: 5,
-                opacity: 0.8,
-              }}
-            >
-              {visible ? (
-                <IconEyeOff color="white" />
-              ) : (
-                <IconEye color="white" />
-              )}
-            </div>
+            {!loading && (
+              <div
+                onClick={() => setVisible(!visible)}
+                style={{
+                  cursor: "pointer",
+                  marginTop: 5,
+                  opacity: 0.8,
+                }}
+              >
+                {visible ? (
+                  <IconEyeOff color="white" />
+                ) : (
+                  <IconEye color="white" />
+                )}
+              </div>
+            )}
+
           </div>
         )}
 

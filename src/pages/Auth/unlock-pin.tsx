@@ -8,6 +8,7 @@ export default function UnlockPin() {
   const [pin, setPin] = useState("");
   const [failCount, setFailCount] = useState(0);
   const [shake, setShake] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const press = (d: string) => {
     if (pin.length < 6) setPin(pin + d);
@@ -16,7 +17,10 @@ export default function UnlockPin() {
   const back = () => setPin(pin.slice(0, -1));
 
   const verify = async () => {
+    if (loading) return;
+    setLoading(true);
     const handleFailedAttempt = async (message?: string) => {
+      setLoading(false);
       setPin("");
       setShake(true);
       setTimeout(() => setShake(false), 400);
@@ -61,7 +65,7 @@ export default function UnlockPin() {
         await handleFailedAttempt(respData.message);
         return;
       }
-
+      setLoading(false);
       alert("Terjadi kesalahan saat verifikasi PIN.");
     }
   };
@@ -112,7 +116,15 @@ export default function UnlockPin() {
 
         <Button variant="outline" size="xl" radius="xl" onClick={back}>⌫</Button>
         <Button variant="outline" size="xl" radius="xl" onClick={() => press("0")}>0</Button>
-        <Button radius="xl" size="xl" onClick={verify} disabled={pin.length !== 6}>OK</Button>
+        <Button
+        radius="xl"
+        size="xl"
+        onClick={verify}
+        loading={loading}
+        disabled={pin.length !== 6 || loading}
+      >
+        OK
+      </Button>
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import { Drawer, Button, Text } from "@mantine/core";
 import { useState } from "react";
 import api from "../services/axios";
 
-export default function PinSheet({ opened, onClose, onSuccess }: any) {
+export default function PinSheet({ opened, onClose, onSuccess, loading  }: any) {
   const [pin, setPin] = useState("");
 
   const press = (d: string) => {
@@ -62,9 +62,10 @@ export default function PinSheet({ opened, onClose, onSuccess }: any) {
 
         <Button
           onClick={verify}
-          disabled={pin.length !== 6}
+          disabled={pin.length !== 6 || loading}
           radius="xl"
           size="xl"
+          loading={loading}
         >
           OK
         </Button>

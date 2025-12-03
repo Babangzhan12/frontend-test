@@ -3,24 +3,45 @@ import { Button, Card, Group, Text } from "@mantine/core";
 import { Link, useNavigate } from "react-router-dom";
 import ATMCard from "../../components/atm-card";
 import api from "../../services/axios";
+import { Loader } from "@mantine/core";
 
 export default function Accounts() {
   const navigate = useNavigate();
   const [accounts, setAccounts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const loadAccounts = async () => {
-    try {
-      const res = await api.get("/accounts");
-      setAccounts(Array.isArray(res.data.data) ? res.data.data : []);
-    } catch (err) {
-      console.error(err);
-      setAccounts([]);
-    }
-  };
+  setLoading(true);
+  try {
+    const res = await api.get("/accounts");
+    setAccounts(Array.isArray(res.data.data) ? res.data.data : []);
+  } catch (err) {
+    console.error(err);
+    setAccounts([]);
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     loadAccounts();
   }, []);
+
+  if (loading) {
+  return (
+    <div
+      style={{
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        background: "#f3f6fa"
+      }}
+    >
+      <Loader size="lg" color="blue" />
+    </div>
+  );
+}
 
   return (
     <div style={{ paddingBottom: 120 }}>

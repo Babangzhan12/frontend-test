@@ -6,15 +6,21 @@ import {
   IconCoin,
 } from "@tabler/icons-react";
 import api from "../../services/axios";
+import { Loader } from "@mantine/core";
 
 export default function History() {
   const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const loadHistory = async () => {
+  setLoading(true);
+  try {
     const res = await api.get("/transactions");
     setItems(res.data?.data || []);
-  };
-
+  } finally {
+    setLoading(false);
+  }
+};
   useEffect(() => {
     loadHistory();
   }, []);
@@ -36,6 +42,22 @@ export default function History() {
     withdraw: "Withdraw",
     interest: "Interest",
   };
+
+  if (loading) {
+  return (
+    <div
+      style={{
+        height: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        background: "#f3f6fa",
+      }}
+    >
+      <Loader size="lg" color="blue" />
+    </div>
+  );
+}
 
   return (
     <div>

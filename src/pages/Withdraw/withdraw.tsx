@@ -14,6 +14,7 @@ export default function Withdraw() {
 
   const [account, setAccount] = useState<any>(null);
   const [minRemaining, setMinRemaining] = useState(0);
+  const [saving, setSaving] = useState(false);
 
   const loadAccount = async () => {
     const res = await api.get(`/accounts/${id}`);
@@ -37,12 +38,22 @@ export default function Withdraw() {
   };
 
   const doWithdraw = async () => {
+  if (saving) return;
+  setSaving(true);
+
+  try {
     await api.post(`/transactions/${id}/withdraw`, {
       amount,
       date: new Date(),
     });
     navigate("/success-withdraw");
-  };
+  } catch (err) {
+    console.error(err);
+    alert("Failed to withdraw");
+  } finally {
+    setSaving(false);
+  }
+};
 
   if (!account) return <Text>Loading...</Text>;
 
@@ -93,6 +104,7 @@ export default function Withdraw() {
         opened={pinOpen}
         onClose={() => setPinOpen(false)}
         onSuccess={doWithdraw}
+        loading={saving}
       />
     </div>
   );

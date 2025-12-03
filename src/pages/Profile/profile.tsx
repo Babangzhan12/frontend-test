@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import { TextInput, Button, Paper } from "@mantine/core";
 import api from "../../services/axios";
 import { useAuth } from "../../store/auth.store";
+import { Loader } from "@mantine/core";
 
 export default function Profile() {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [profile, setProfile] = useState<any>({
     fullName: "",
     address: "",
@@ -15,26 +18,49 @@ export default function Profile() {
   const profileId = user?.profile?.profileId;
 
   const loadProfile = async () => {
-    const res = await await api.get(`/profile/${profileId}`);
+  setLoading(true);
+  try {
+    const res = await api.get(`/profile/${profileId}`);
     const p = res.data.data;
-     setProfile({
-    fullName: p.fullName,
-    address: p.address,
-    phoneNumber: p.phoneNumber,
-    ktpNumber: p.ktpNumber,
-  });
-  };
 
-  console.log("profile", profile);
+    setProfile({
+      fullName: p.fullName,
+      address: p.address,
+      phoneNumber: p.phoneNumber,
+      ktpNumber: p.ktpNumber,
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
   const saveProfile = async () => {
-    await api.put(`/profile/${profileId}`, profile);
-    alert("Profile updated!");
+    setSaving(true);
+    try {
+      await api.put(`/profile/${profileId}`, profile);
+      alert("Profile updated!");
+    } finally {
+      setSaving(false);
+    }
   };
 
   useEffect(() => {
     loadProfile();
   }, []);
+
+  if (loading) {
+  return (
+    <div style={{
+      height: "100vh",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      background: "#f7f9fc"
+    }}>
+      <Loader size="lg" color="blue" />
+    </div>
+  );
+}
 
   return (
     <div style={{ padding: "20px" }}>
@@ -83,7 +109,7 @@ export default function Profile() {
           mt="md"
         />
 
-        <Button fullWidth mt="lg" onClick={saveProfile}>
+        <Button fullWidth mt="lg" onClick={saveProfile} loading={saving}>
           Save Changes
         </Button>
       </Paper>

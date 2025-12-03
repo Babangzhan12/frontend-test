@@ -9,6 +9,7 @@ export default function Deposit() {
   const [amount, setAmount] = useState(0);
   const navigate = useNavigate();
   const [pinOpen, setPinOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const submitDeposit = () => {
     if (amount <= 0) {
@@ -19,12 +20,22 @@ export default function Deposit() {
   };
 
   const doDeposit = async () => {
+  if (saving) return;
+  setSaving(true);
+
+  try {
     await api.post(`/transactions/${id}/deposit`, {
       amount,
       date: new Date(),
     });
     navigate("/success-deposit");
-  };
+  } catch (err) {
+    console.error(err);
+    alert("Failed to deposit");
+  } finally {
+    setSaving(false);
+  }
+};
 
   return (
     <div style={{ padding: 20 }}>
@@ -44,6 +55,7 @@ export default function Deposit() {
         opened={pinOpen}
         onClose={() => setPinOpen(false)}
         onSuccess={doDeposit}
+        loading={saving}
       />
     </div>
   );

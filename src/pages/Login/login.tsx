@@ -5,17 +5,23 @@ import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   const login = useAuth((s) => s.login);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const doLogin = async () => {
-    const ok = await login(username, password);
-    console.debug('Login result:', ok, 'token:', localStorage.getItem('token'));
-    if (ok) navigate("/dashboard", { replace: true });
-    else alert("Invalid username or password!");
-  };
+  const doLogin = async (e?: React.FormEvent) => {
+  if (e) e.preventDefault();
+  setLoading(true);
+
+  const ok = await login(username, password);
+
+  setLoading(false);
+
+  if (ok) navigate("/dashboard", { replace: true });
+  else alert("Invalid username or password!");
+};
 
   return (
     <div style={{
@@ -30,25 +36,33 @@ export default function Login() {
           Login
         </Title>
 
-        <TextInput
-          label="Username"
-          placeholder="Enter your username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          mt="md"
-        />
+        <form onSubmit={doLogin}>
+          <TextInput
+            label="Username"
+            placeholder="Enter your username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            mt="md"
+          />
 
-        <PasswordInput
-          label="Password"
-          placeholder="Enter password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          mt="md"
-        />
+          <PasswordInput
+            label="Password"
+            placeholder="Enter password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            mt="md"
+          />
 
-        <Button fullWidth mt="lg" size="md" onClick={doLogin}>
-          Login
-        </Button>
+          <Button
+            fullWidth
+            mt="lg"
+            size="md"
+            type="submit"
+            loading={loading}
+          >
+            Login
+          </Button>
+        </form>
       </Paper>
     </div>
   );
