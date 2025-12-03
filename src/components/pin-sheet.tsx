@@ -4,29 +4,45 @@ import api from "../services/axios";
 
 export default function PinSheet({ opened, onClose, onSuccess, loading  }: any) {
   const [pin, setPin] = useState("");
+  const [verifying, setVerifying] = useState(false);
+
 
   const press = (d: string) => {
-    if (pin.length < 6) setPin(pin + d);
+    if (pin.length < 6 && !verifying && !loading) setPin(pin + d);
   };
 
-  const back = () => setPin(pin.slice(0, -1));
+  const back = () => {
+    if (!verifying && !loading) setPin(pin.slice(0, -1));
+  };
 
   const verify = async () => {
-    const res = await api.post("/auth/verify-pin", { pin });
-    if (res.data?.status) {
-      setPin("");
-      onSuccess();
-      onClose();
-    } else {
-      alert("Wrong PIN");
-      setPin("");
+    if (verifying || loading) return;
+    setVerifying(true);
+
+    try {
+      const res = await api.post("/auth/verify-pin", { pin });
+
+      if (res.data?.status) {
+        setPin("");
+        onSuccess();
+        onClose();
+      } else {
+        alert("Wrong PIN");
+        setPin("");
+      }
+    } catch (err) {
+      alert("Error verifying PIN");
+    } finally {
+      setVerifying(false);
     }
   };
+
+  const isBtnDisabled = pin.length !== 6 || verifying || loading;
 
   return (
     <Drawer
       opened={opened}
-      onClose={onClose}
+      onClose={() => !verifying && !loading && onClose()}
       position="bottom"
       size="auto"
       styles={{
@@ -54,18 +70,27 @@ export default function PinSheet({ opened, onClose, onSuccess, loading  }: any) 
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginTop: 20 }}>
         {["1","2","3","4","5","6","7","8","9"].map(n => (
-          <Button key={n} onClick={() => press(n)} variant="outline" size="xl" radius="xl">{n}</Button>
+           <Button
+            key={n}
+            variant="outline"
+            size="xl"
+            radius="xl"
+            onClick={() => press(n)}
+            disabled={verifying || loading}
+          >
+            {n}
+          </Button>
         ))}
 
-        <Button onClick={back} variant="outline" size="xl" radius="xl">⌫</Button>
-        <Button onClick={() => press("0")} variant="outline" size="xl" radius="xl">0</Button>
+         <Button variant="outline" size="xl" radius="xl" onClick={back} disabled={verifying || loading}>⌫</Button>
+        <Button variant="outline" size="xl" radius="xl" onClick={() => press("0")} disabled={verifying || loading}>0</Button>
 
         <Button
-          onClick={verify}
-          disabled={pin.length !== 6 || loading}
           radius="xl"
           size="xl"
-          loading={loading}
+          onClick={verify}
+          disabled={isBtnDisabled}
+          loading={verifying || loading}
         >
           OK
         </Button>
